@@ -3,6 +3,8 @@
 @@include[includes.md](includes.md) { #actor-api }
 For the full documentation of this feature and for new projects see @ref:[Cluster Sharding](typed/cluster-sharding.md).
 
+@@project-info{ projectId="akka-cluster-sharding" }
+
 ## Dependency
 
 To use Cluster Sharding, you must add the following dependency in your project:
@@ -44,7 +46,7 @@ You may define it another way, but it must be unique.
 When using the sharding extension you are first, typically at system startup on each node
 in the cluster, supposed to register the supported entity types with the `ClusterSharding.start`
 method. `ClusterSharding.start` gives you the reference which you can pass along.
-Please note that `ClusterSharding.start` will start a `ShardRegion` in [proxy only mode](#proxy-only-mode) 
+Please note that `ClusterSharding.start` will start a `ShardRegion` in @ref:[proxy only mode](#proxy-only-mode) 
 when there is no match between the roles of the current cluster node and the role specified in 
 `ClusterShardingSettings`.
 
@@ -79,7 +81,7 @@ be the same. Otherwise the entity actor might accidentally be started in several
 
 Creating a good sharding algorithm is an interesting challenge in itself. Try to produce a uniform distribution,
 i.e. same amount of entities in each shard. As a rule of thumb, the number of shards should be a factor ten greater
-than the planned maximum number of cluster nodes. Less shards than number of nodes will result in that some nodes
+than the planned maximum number of cluster nodes. Fewer shards than number of nodes will result in that some nodes
 will not host any shards. Too many shards will result in less efficient management of the shards, e.g. rebalancing
 overhead, and increased latency because the coordinator is involved in the routing of the first message for each
 shard. The sharding algorithm must be the same on all nodes in a running cluster. It can be changed after stopping
@@ -219,21 +221,13 @@ to the `ShardRegion` actor to hand off all shards that are hosted by that `Shard
 During this period other regions will buffer messages for those shards in the same way as when a rebalance is
 triggered by the coordinator. When the shards have been stopped the coordinator will allocate these shards elsewhere.
 
-This is performed automatically by the @ref:[Coordinated Shutdown](actors.md#coordinated-shutdown) and is therefore part of the
+This is performed automatically by the @ref:[Coordinated Shutdown](coordinated-shutdown.md) and is therefore part of the
 graceful leaving process of a cluster member.
 
 <a id="removeinternalclustershardingdata"></a>
 ## Removal of Internal Cluster Sharding Data
 
 See @ref:[removal of Internal Cluster Sharding Data](typed/cluster-sharding.md#removal-of-internal-cluster-sharding-data) in the documentation of the new APIs.
-
-## Configuration
-
-`ClusterShardingSettings` is a parameter to the `start` method of
-the `ClusterSharding` extension, i.e. each each entity type can be configured with different settings
-if needed.
-
-See @ref:[configuration](typed/cluster-sharding.md#configuration) for more information.
 
 ## Inspecting cluster sharding state
 
@@ -256,20 +250,13 @@ directly sending messages to the individual entities.
 
 ## Lease
 
-A @ref[lease](coordination.md) can be used as an additional safety measure to ensure a shard 
-does not run on two nodes.
+A lease can be used as an additional safety measure to ensure a shard does not run on two nodes.
+See @ref:[Lease](typed/cluster-sharding.md#lease) in the documentation of the new APIs.
 
-Reasons for how this can happen:
+## Configuration
 
-* Network partitions without an appropriate downing provider
-* Mistakes in the deployment process leading to two separate Akka Clusters
-* Timing issues between removing members from the Cluster on one side of a network partition and shutting them down on the other side
+`ClusterShardingSettings` is a parameter to the `start` method of
+the `ClusterSharding` extension, i.e. each each entity type can be configured with different settings
+if needed.
 
-A lease can be a final backup that means that each shard won't create child entity actors unless it has the lease. 
-
-To use a lease for sharding set `akka.cluster.sharding.use-lease` to the configuration location
-of the lease to use. Each shard will try and acquire a lease with with the name `<actor system name>-shard-<type name>-<shard id>` and
-the owner is set to the `Cluster(system).selfAddress.hostPort`.
-
-If a shard can't acquire a lease it will remain uninitialized so messages for entities it owns will
-be buffered in the `ShardRegion`. If the lease is lost after initialization the Shard will be terminated.
+See @ref:[configuration](typed/cluster-sharding.md#configuration) for more information.

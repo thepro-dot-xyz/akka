@@ -4,9 +4,11 @@
 For the Akka Classic documentation of this feature see @ref:[Classic Testing](../testing.md).
 @@@
 
+@@project-info{ projectId="akka-actor-testkit-typed" }
+
 ## Dependency
 
-To use Akka TestKit add the module to your project:
+To use Actor TestKit add the module to your project:
 
 @@dependency[sbt,Maven,Gradle] {
   group=com.typesafe.akka

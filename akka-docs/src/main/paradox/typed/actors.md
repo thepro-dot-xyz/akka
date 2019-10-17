@@ -7,9 +7,17 @@ project.description: The Actor model, managing internal state and changing behav
 For the Akka Classic documentation of this feature see @ref:[Classic Actors](../actors.md).
 @@@
 
+@@@ note
+Both the Java and Scala DSLs of Akka modules bundled in the same JAR. For a smooth development experience,
+when using an IDE such as Eclipse or IntelliJ, you can disable the auto-importer from suggesting `javadsl`
+imports when working in Scala, or viceversa. See @ref:[IDE Tips](../additional/ide.md). 
+@@@
+
+@@project-info{ projectId="akka-actor-typed" }
+
 ## Dependency
 
-To use Akka Actor Typed, you must add the following dependency in your project:
+To use Akka Actors, add the following dependency in your project:
 
 @@dependency[sbt,Maven,Gradle] {
   group=com.typesafe.akka
@@ -17,13 +25,27 @@ To use Akka Actor Typed, you must add the following dependency in your project:
   version=$akka.version$
 }
 
+## Akka Actors
+
+The [Actor Model](http://en.wikipedia.org/wiki/Actor_model) provides a higher level of abstraction for writing concurrent
+and distributed systems. It alleviates the developer from having to deal with
+explicit locking and thread management, making it easier to write correct
+concurrent and parallel systems. Actors were defined in the 1973 paper by Carl
+Hewitt but have been popularized by the Erlang language, and used for example at
+Ericsson with great success to build highly concurrent and reliable telecom
+systems. The API of Akka’s Actors has borrowed some of its syntax from Erlang.
+ 
 ## First example
 
 If you are new to Akka you might want to start with reading the @ref:[Getting Started Guide](guide/introduction.md)
-and then come back here to learn more.
+and then come back here to learn more. 
+
+It is helpful to become familiar with the foundational, external and internal
+ecosystem of your Actors, to see what you can leverage and customize as needed, see
+@ref:[Actor Systems](../general/actor-systems.md) and @ref:[Actor References, Paths and Addresses](../general/addressing.md).
 
 As discussed in @ref:[Actor Systems](../general/actor-systems.md) Actors are about
-sending messages between independent units of computation, but how does that
+sending messages between independent units of computation, but what does that
 look like?
 
 In all of the following these imports are assumed:
@@ -36,6 +58,8 @@ Java
 
 With these in place we can define our first Actor, and it will say
 hello!
+
+![hello-world1.png](./images/hello-world1.png)
 
 Scala
 :  @@snip [IntroSpec.scala](/akka-actor-typed-tests/src/test/scala/docs/akka/typed/IntroSpec.scala) { #hello-world-actor }
@@ -78,11 +102,13 @@ protocol but Actors can model arbitrarily complex protocols when needed. The
 protocol is bundled together with the behavior that implements it in a nicely
 wrapped scope—the `HelloWorld` @scala[object]@java[class].
 
-As Carl Hewitt said, one Actor is no Actor—it would be quite lonely with
+As Carl Hewitt said, one Actor is no Actor — it would be quite lonely with
 nobody to talk to. We need another Actor that interacts with the `Greeter`.
 Let's make a `HelloWorldBot` that receives the reply from the `Greeter` and sends a number
 of additional greeting messages and collect the replies until a given max number
 of messages have been reached.
+
+![hello-world2.png](./images/hello-world2.png)
 
 Scala
 :  @@snip [IntroSpec.scala](/akka-actor-typed-tests/src/test/scala/docs/akka/typed/IntroSpec.scala) { #hello-world-bot }
@@ -150,6 +176,8 @@ The next example is more realistic and demonstrates some important patterns:
 * Handle sessions by using child actors
 * Handling state by changing behavior
 * Using multiple actors to represent different parts of a protocol in a type safe way
+
+![chat-room.png](./images/chat-room.png)
 
 ### Functional Style
 

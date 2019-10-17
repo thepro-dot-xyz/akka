@@ -5,6 +5,7 @@
 package akka.actor.typed.scaladsl.adapter
 
 import scala.util.control.NoStackTrace
+
 import akka.actor.InvalidMessageException
 import akka.actor.testkit.typed.TestException
 import akka.actor.typed.scaladsl.Behaviors
@@ -15,8 +16,10 @@ import akka.actor.typed.Terminated
 import akka.testkit._
 import akka.Done
 import akka.NotUsed
+import akka.actor.ActorInitializationException
 import akka.actor.testkit.typed.scaladsl.LogCapturing
-import akka.actor.testkit.typed.scaladsl.LoggingEventFilter
+import akka.actor.testkit.typed.scaladsl.LoggingTestKit
+import akka.actor.typed.internal.adapter.SchedulerAdapter
 import akka.{ actor => classic }
 import org.scalatest.{ BeforeAndAfterAll, Matchers, WordSpec }
 
@@ -27,6 +30,15 @@ object AdapterSpec {
     def receive = {
       case "ping"     => sender() ! "pong"
       case t: ThrowIt => throw t
+    }
+  }
+
+  val classicFailInConstructor: classic.Props = classic.Props(new ClassicFailInConstructor)
+
+  class ClassicFailInConstructor extends classic.Actor {
+    throw new TestException("Exception in constructor")
+    def receive = {
+      case "ping" => sender() ! "pong"
     }
   }
 
@@ -62,6 +74,10 @@ object AdapterSpec {
             context.watch(child)
             child ! ThrowIt3
             child.tell("ping", context.self.toClassic)
+            Behaviors.same
+          case "supervise-start-fail" =>
+            val child = context.actorOf(classicFailInConstructor)
+            context.watch(child)
             Behaviors.same
           case "stop-child" =>
             val child = context.actorOf(classic1)
@@ -202,6 +218,12 @@ class AdapterSpec extends WordSpec with Matchers with BeforeAndAfterAll with Log
         } finally if (system != null) TestKit.shutdownActorSystem(systemN.toClassic)
       }
     }
+
+    "convert Scheduler" in {
+      val typedScheduler = system.scheduler.toTyped
+      typedScheduler.getClass should ===(classOf[SchedulerAdapter])
+      (typedScheduler.toClassic should be).theSameInstanceAs(system.scheduler)
+    }
   }
 
   "Adapted actors" must {
@@ -280,11 +302,24 @@ class AdapterSpec extends WordSpec with Matchers with BeforeAndAfterAll with Log
       val typedRef = system.spawnAnonymous(typed1(ignore, probe.ref))
 
       // only stop supervisorStrategy
-      LoggingEventFilter
+      LoggingTestKit
         .error[AdapterSpec.ThrowIt3.type]
         .intercept {
           typedRef ! "supervise-restart"
           probe.expectMsg("ok")
+        }(system.toTyped)
+    }
+
+    "supervise classic child that throws in constructor from typed parent" in {
+      val probe = TestProbe()
+      val ignore = system.actorOf(classic.Props.empty)
+      val typedRef = system.spawnAnonymous(typed1(ignore, probe.ref))
+
+      LoggingTestKit
+        .error[ActorInitializationException]
+        .intercept {
+          typedRef ! "supervise-start-fail"
+          probe.expectMsg("terminated")
         }(system.toTyped)
     }
 
@@ -306,7 +341,7 @@ class AdapterSpec extends WordSpec with Matchers with BeforeAndAfterAll with Log
 
     "log exception if not by handled typed supervisor" in {
       val throwMsg = "sad panda"
-      LoggingEventFilter
+      LoggingTestKit
         .error("sad panda")
         .intercept {
           system.spawnAnonymous(unhappyTyped(throwMsg))

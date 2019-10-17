@@ -10,7 +10,7 @@ import akka.actor.typed.internal.adapter.{ PropsAdapter => _, _ }
 import akka.annotation.InternalApi
 
 /**
- * Scala API: Adapters between typed and classic actors and actor systems.
+ * Adapters between typed and classic actors and actor systems.
  * The underlying `ActorSystem` is the classic [[akka.actor.ActorSystem]]
  * which runs Akka Typed [[akka.actor.typed.Behavior]] on an emulation layer. In this
  * system typed and classic actors can coexist.
@@ -165,5 +165,23 @@ package object adapter {
    * Implicit conversion from classic [[akka.actor.ActorRef]] to [[akka.actor.typed.ActorRef]].
    */
   implicit def actorRefAdapter[T](ref: akka.actor.ActorRef): ActorRef[T] = ActorRefAdapter(ref)
+
+  /**
+   * Extension methods added to [[akka.actor.typed.Scheduler]].
+   */
+  implicit class TypedSchedulerOps(val scheduler: Scheduler) extends AnyVal {
+    def toClassic: akka.actor.Scheduler = SchedulerAdapter.toClassic(scheduler)
+  }
+
+  /**
+   * Extension methods added to [[akka.actor.Scheduler]].
+   */
+  implicit class ClassicSchedulerOps(val scheduler: akka.actor.Scheduler) extends AnyVal {
+
+    /**
+     * Adapt the classic `Scheduler` to `akka.actor.typed.Scheduler`.
+     */
+    def toTyped: Scheduler = new SchedulerAdapter(scheduler)
+  }
 
 }

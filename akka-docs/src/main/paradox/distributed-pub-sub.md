@@ -3,6 +3,8 @@
 @@include[includes.md](includes.md) { #actor-api }
 For the new API see FIXME https://github.com/akka/akka/issues/26338.
 
+@@project-info{ projectId="akka-cluster-tools" }
+
 ## Dependency
 
 To use Distributed Publish Subscribe you must add the following dependency in your project:
@@ -43,7 +45,7 @@ You can send messages via the mediator on any node to registered actors on
 any other node.
 
 There a two different modes of message delivery, explained in the sections
-[Publish](#distributed-pub-sub-publish) and [Send](#distributed-pub-sub-send) below.
+@ref:[Publish](#distributed-pub-sub-publish) and @ref:[Send](#distributed-pub-sub-send) below.
 
 @@@ div { .group-scala }
 

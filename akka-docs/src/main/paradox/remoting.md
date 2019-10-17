@@ -20,6 +20,8 @@ such as [HTTP](https://doc.akka.io/docs/akka-http/current/),
 
 @@@
 
+@@project-info{ projectId="akka-remote" }
+
 ## Dependency
 
 To use Akka Remoting, you must add the following dependency in your project:
@@ -80,7 +82,7 @@ listening for connections and handling messages as not to interfere with other a
 @@@
 
 The example above only illustrates the bare minimum of properties you have to add to enable remoting.
-All settings are described in [Remote Configuration](#remote-configuration).
+All settings are described in @ref:[Remote Configuration](#remote-configuration).
 
 ## Introduction
 
@@ -315,7 +317,7 @@ Watching a remote actor is not different than watching a local actor, as describ
 Please see:
 
 * @ref:[Phi Accrual Failure Detector](typed/failure-detector.md) implementation for details
-* [Using the Failure Detector](#using-the-failure-detector) below for usage 
+* @ref:[Using the Failure Detector](#using-the-failure-detector) below for usage 
 
 ### Using the Failure Detector
  
@@ -326,7 +328,7 @@ implementing the `akka.remote.FailureDetector` and configuring it:
 akka.remote.watch-failure-detector.implementation-class = "com.example.CustomFailureDetector"
 ``` 
  
-In the [Remote Configuration](#remote-configuration) you may want to adjust these
+In the @ref:[Remote Configuration](#remote-configuration) you may want to adjust these
 depending on you environment:
 
 * When a *phi* value is considered to be a failure `akka.remote.watch-failure-detector.threshold`
@@ -582,7 +584,7 @@ marking them `PossiblyHarmful` so that a client cannot forge them.
 ## Remote Configuration
 
 There are lots of configuration properties that are related to remoting in Akka. We refer to the
-@ref:[reference configuration](general/configuration.md#config-akka-remote) for more information.
+@ref:[reference configuration](general/configuration-reference.md#config-akka-remote) for more information.
 
 @@@ note
 

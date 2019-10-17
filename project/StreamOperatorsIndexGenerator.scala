@@ -109,11 +109,9 @@ object StreamOperatorsIndexGenerator extends AutoPlugin {
       "actorRefWithAck" // deprecated
     ),
     "ActorSink" -> Seq(
-      "actorRefWithBackpressure",
       "actorRefWithAck" // deprecated
     ),
     "ActorSource" -> Seq(
-      "actorRef",
       "actorRefWithAck" // deprecated
     )
   )
@@ -157,6 +155,8 @@ object StreamOperatorsIndexGenerator extends AutoPlugin {
         "akka-stream/src/main/scala/akka/stream/javadsl/RestartFlow.scala",
         "akka-stream/src/main/scala/akka/stream/scaladsl/RestartSink.scala",
         "akka-stream/src/main/scala/akka/stream/javadsl/RestartSink.scala",
+        "akka-stream/src/main/scala/akka/stream/scaladsl/RetryFlow.scala",
+        "akka-stream/src/main/scala/akka/stream/javadsl/RetryFlow.scala",
 
         // akka-stream-typed
         "akka-stream-typed/src/main/scala/akka/stream/typed/javadsl/ActorSource.scala",
@@ -164,7 +164,7 @@ object StreamOperatorsIndexGenerator extends AutoPlugin {
         "akka-stream-typed/src/main/scala/akka/stream/typed/javadsl/ActorFlow.scala",
         "akka-stream-typed/src/main/scala/akka/stream/typed/scaladsl/ActorFlow.scala",
         "akka-stream-typed/src/main/scala/akka/stream/typed/scaladsl/ActorSink.scala",
-        "akka-stream-typed/src/main/scala/akka/stream/typed/javadsl/ActorSink.scala",
+        "akka-stream-typed/src/main/scala/akka/stream/typed/javadsl/ActorSink.scala"
       ).flatMap{ f =>
         val slashesNr = f.count(_ == '/')
         val element = f.split("/")(slashesNr).split("\\.")(0)

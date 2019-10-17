@@ -10,7 +10,7 @@ This document describes the design concepts of Akka Cluster. For the guide on us
 
 Akka Cluster provides a fault-tolerant decentralized peer-to-peer based
 @ref:[Cluster Membership Service](cluster-membership.md#cluster-membership-service) with no single point of failure or 
-single point of bottleneck. It does this using [gossip](#gossip) protocols and an automatic [failure detector](#failure-detector).
+single point of bottleneck. It does this using @ref:[gossip](#gossip) protocols and an automatic [failure detector](#failure-detector).
 
 Akka Cluster allows for building distributed applications, where one application or service spans multiple nodes
 (in practice multiple `ActorSystem`s). 
@@ -112,11 +112,6 @@ The role of the `leader` is to shift members in and out of the cluster, changing
 `joining` members to the `up` state or `exiting` members to the `removed`
 state. Currently `leader` actions are only triggered by receiving a new cluster
 state with gossip convergence.
-
-The `leader` also has the power, if configured so, to "auto-down" a node that
-according to the @ref:[Failure Detector](#failure-detector) is considered `unreachable`. This means setting
-the `unreachable` node status to `down` automatically after a configured time
-of unreachability.
 
 #### Seed Nodes
 

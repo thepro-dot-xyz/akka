@@ -195,6 +195,19 @@ interface ShardingCompileOnlyTest {
     // #send
   }
 
+  public static void roleExample() {
+    ActorSystem system = ActorSystem.create(Behaviors.empty(), "ShardingExample");
+    ClusterSharding sharding = ClusterSharding.get(system);
+
+    // #roles
+    EntityTypeKey<Counter.Command> typeKey = EntityTypeKey.create(Counter.Command.class, "Counter");
+
+    ActorRef<ShardingEnvelope<Counter.Command>> shardRegionOrProxy =
+        sharding.init(
+            Entity.of(typeKey, ctx -> Counter.create(ctx.getEntityId())).withRole("backend"));
+    // #roles
+  }
+
   public static void persistenceExample() {
     ActorSystem system = ActorSystem.create(Behaviors.empty(), "ShardingExample");
     ClusterSharding sharding = ClusterSharding.get(system);
@@ -212,5 +225,27 @@ interface ShardingCompileOnlyTest {
                     PersistenceId.of(
                         entityContext.getEntityTypeKey().name(), entityContext.getEntityId()))));
     // #persistence
+  }
+
+  public static void dataCenterExample() {
+    ActorSystem system = ActorSystem.create(Behaviors.empty(), "ShardingExample");
+    EntityTypeKey<Counter.Command> typeKey = EntityTypeKey.create(Counter.Command.class, "Counter");
+    String entityId = "a";
+
+    // #proxy-dc
+    ActorRef<ShardingEnvelope<Counter.Command>> proxy =
+        ClusterSharding.get(system)
+            .init(
+                Entity.of(typeKey, ctx -> Counter.create(ctx.getEntityId())).withDataCenter("dc2"));
+    // #proxy-dc
+
+    // #proxy-dc-entityref
+    // it must still be started before usage
+    ClusterSharding.get(system)
+        .init(Entity.of(typeKey, ctx -> Counter.create(ctx.getEntityId())).withDataCenter("dc2"));
+
+    EntityRef<Counter.Command> entityRef =
+        ClusterSharding.get(system).entityRefFor(typeKey, entityId, "dc2");
+    // #proxy-dc-entityref
   }
 }

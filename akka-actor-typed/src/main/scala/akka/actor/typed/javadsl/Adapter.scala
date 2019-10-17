@@ -10,11 +10,12 @@ import akka.actor.typed.Props
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.ActorSystem
+import akka.actor.typed.Scheduler
 import akka.actor.typed.internal.adapter.ActorContextAdapter
 import akka.japi.Creator
 
 /**
- * Java API: Adapters between typed and classic actors and actor systems.
+ * Adapters between typed and classic actors and actor systems.
  * The underlying `ActorSystem` is the classic [[akka.actor.ActorSystem]]
  * which runs Akka [[akka.actor.typed.Behavior]] on an emulation layer. In this
  * system typed and classic actors can coexist.
@@ -155,4 +156,10 @@ object Adapter {
    */
   def props[T](behavior: Creator[Behavior[T]]): akka.actor.Props =
     props(behavior, Props.empty)
+
+  def toClassic(scheduler: Scheduler): akka.actor.Scheduler =
+    scheduler.toClassic
+
+  def toTyped[T](scheduler: akka.actor.Scheduler): Scheduler =
+    scheduler.toTyped
 }

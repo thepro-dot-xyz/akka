@@ -4,8 +4,15 @@
 
 package jdocs.akka.cluster.typed;
 
-// #cluster-imports
+// #join-seed-nodes
 import akka.actor.Address;
+import akka.actor.AddressFromURIString;
+import akka.cluster.Member;
+import akka.cluster.typed.JoinSeedNodes;
+
+// #join-seed-nodes
+
+// #cluster-imports
 import akka.actor.typed.*;
 import akka.actor.typed.javadsl.*;
 import akka.cluster.ClusterEvent;
@@ -14,6 +21,10 @@ import akka.cluster.typed.*;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 // FIXME use awaitAssert to await cluster forming like in BasicClusterExampleSpec
 public class BasicClusterExampleTest { // extends JUnitSuite {
@@ -98,5 +109,57 @@ public class BasicClusterExampleTest { // extends JUnitSuite {
       system.terminate();
       system2.terminate();
     }
+  }
+
+  void illustrateJoinSeedNodes() {
+    ActorSystem<Void> system = null;
+
+    // #join-seed-nodes
+    List<Address> seedNodes = new ArrayList<>();
+    seedNodes.add(AddressFromURIString.parse("akka://ClusterSystem@127.0.0.1:2551"));
+    seedNodes.add(AddressFromURIString.parse("akka://ClusterSystem@127.0.0.1:2552"));
+
+    Cluster.get(system).manager().tell(new JoinSeedNodes(seedNodes));
+    // #join-seed-nodes
+  }
+
+  static class Backend {
+    static Behavior<Void> create() {
+      return Behaviors.empty();
+    }
+  }
+
+  static class Frontend {
+    static Behavior<Void> create() {
+      return Behaviors.empty();
+    }
+  }
+
+  void illustrateRoles() {
+    ActorContext<Void> context = null;
+
+    // #hasRole
+    Member selfMember = Cluster.get(context.getSystem()).selfMember();
+    if (selfMember.hasRole("backend")) {
+      context.spawn(Backend.create(), "back");
+    } else if (selfMember.hasRole("front")) {
+      context.spawn(Frontend.create(), "front");
+    }
+    // #hasRole
+  }
+
+  void illustrateDcAccess() {
+    ActorSystem<Void> system = null;
+
+    // #dcAccess
+    final Cluster cluster = Cluster.get(system);
+    // this node's data center
+    String dc = cluster.selfMember().dataCenter();
+    // all known data centers
+    Set<String> allDc = cluster.state().getAllDataCenters();
+    // a specific member's data center
+    Member aMember = cluster.state().getMembers().iterator().next();
+    String aDc = aMember.dataCenter();
+    // #dcAccess
   }
 }

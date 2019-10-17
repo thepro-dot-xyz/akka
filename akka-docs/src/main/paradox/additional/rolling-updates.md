@@ -58,7 +58,7 @@ overhead several times.
  
 ### Graceful shutdown 
 
-For rolling updates it is best to leave the Cluster gracefully via @ref:[Coordinated Shutdown](../actors.md#coordinated-shutdown),
+For rolling updates it is best to leave the Cluster gracefully via @ref:[Coordinated Shutdown](../coordinated-shutdown.md),
 which will run automatically on SIGTERM, when the Cluster node sees itself as `Exiting`.
 Environments such as Kubernetes send a SIGTERM, however if the JVM is wrapped with a script ensure that it forwards the signal.
 @ref:[Graceful shutdown](../cluster-sharding.md#graceful-shutdown) of Cluster Singletons and Cluster Sharding similarly happen automatically.
@@ -140,7 +140,7 @@ If you need to change any of the following aspects of sharding it will require a
  
 ### Migrating from PersistentFSM to EventSourcedBehavior
 
-If you've [migrated from `PersistentFSM` to `EventSourcedBehavior`](../persistence-fsm.md#migration-to-eventsourcedbehavior)
+If you've @ref:[migrated from `PersistentFSM` to `EventSourcedBehavior`](../persistence-fsm.md#migration-to-eventsourcedbehavior)
 and are using PersistenceFSM with Cluster Sharding, a full shutdown is required as shards can move between new and old nodes.
   
 ### Migrating from classic remoting to Artery
